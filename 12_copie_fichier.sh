@@ -51,7 +51,7 @@ then
 				exit 4
 			fi
 		else
-			echo "De toute évidence, ce la,gage n'est plus pratiqué depuis des siècles Maître"
+			echo "De toute évidence, ce langage n'est plus pratiqué depuis des siècles Maître"
 			echo "le fichier cible n'est mpas autorisé en lecture"
 			echo "Code d'erreur : 3"
 			exit 3
