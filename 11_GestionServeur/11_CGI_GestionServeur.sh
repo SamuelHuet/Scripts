@@ -5,7 +5,8 @@
 #Activer le CGI :
 #	#>a2enmod cgi      
 # 	#>systemctl restart apache2
-#Ajouter www-data en admin
+# Ajouter www-data en admin
+# Placer le dossier Images (contenant toutes les images dans /var/www/html/)
 
 #Verification des paramètres GET
 case $QUERY_STRING in
@@ -13,15 +14,15 @@ case $QUERY_STRING in
 				systemctl status ssh >/dev/null
 				if [ $? -eq 3 ]
 				then
-					service ssh start 
+					sudo service ssh start 
 				fi;;
 	eteindressh)	
 				systemctl status ssh >/dev/null
 				if [ $? -eq 0 ]
 				then
-					service ssh stop
+					sudo service ssh stop
 				fi;;
-	eteindrelinux)	shutdown -h now;;
+	eteindrelinux)	sudo shutdown -h now;;
 esac
 
 echo "Content-type: text/html"
@@ -34,6 +35,6 @@ echo "<html>
 		<h1>Gestion du serveur</h1>"
 
 echo "Coucou $(whoami) ! <br/><br/>"
-echo "<a href='?allumessh'>ALLUMER SSH</a> <br/>" 			# <img src='____' />
+echo "<a href='?allumessh'> <img src='/Images/ssh_start.png'/> </a> <br/>" 			
 echo "<a href='?eteindressh'>ETEINDRE SSH</a> <br/>"
-echo "<a href='?eteindrelinux'>ETEINDRE LINUX</a> <br/>"
+echo "<a href='?eteindrelinux'> <img src='/Images/shutdown.png'/> </a> <br/>"
