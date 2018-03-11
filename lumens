@@ -1,0 +1,95 @@
+#!/bin/bash
+#Brightness between 65 and 843
+
+filter=9999
+brightness=9999
+help=$(echo "Type [ENTER] to write commands again")
+tips=$(echo -e "lumens -b [brightness in percent] -f [blue filter in percent] -k [to stop blue filter]")
+install=$(echo "Do not forget to install 'redshift' and 'xbacklight'")
+while getopts ":b:f:k" option
+do
+	case $option in 
+	
+		b)	brightness=$OPTARG
+            brightness=$(echo "scale=2;$brightness*7.78" | bc -l)
+            brightness=$(echo "scale=2;$brightness+65" | bc -l)
+            brightness=$(echo $brightness | cut -d. -f1)
+		;;
+		
+		f)	filter=$OPTARG
+            filter=$(echo "scale=2;$filter*0.01" | bc -l)
+            filter=$(echo "scale=2;1-$filter" | bc -l)
+		;;
+
+        k)  pid=$(ps -ef | egrep "redshift" | sed '/grep/d' | awk ' { print $2 } ')
+            if [ -z $pid ]
+                then   
+                    echo "redshift is not running"
+                else
+                    kill $pid
+            fi
+        ;;
+		
+		\?)	echo "$option option is not in my list"
+            echo $tips
+		;;
+	esac
+done
+
+shift $((OPTIND-1))
+
+if [ $# -eq 1 ]
+    then
+        if [ $1 = "night" ]
+            then
+            sudo echo 1 > /sys/class/backlight/intel_backlight/brightness
+            if [ $? -ne 0 ]
+                then
+                    echo $tips
+                    echo "xbacklight is not installed"
+                    exit 2
+            fi
+            redshift -b 0.7 2>/dev/null >/dev/null &
+            if [ $? -ne 0 ]
+                then
+                    echo $tips
+                    echo "redshift is not installed"
+                    exit 3
+            fi
+            echo $help
+            exit 0
+        fi
+
+        if [ $1 = "day" ]
+            then
+            sudo echo 454 > /sys/class/backlight/intel_backlight/brightness
+            exit 0
+        fi
+
+        if [ $1 = "help" ]
+            then
+            echo $tips
+            echo $install
+            exit 0
+        fi
+fi
+
+if [ $brightness -ne 9999 ]
+    then
+        sudo echo "$brightness" > /sys/class/backlight/intel_backlight/brightness
+        if [ $? -ne 0 ]
+                then
+                    echo $tips
+                    echo "xbacklight is not installed"
+                    exit 2
+        fi
+fi
+
+redshift -b $filter 2>/dev/null >/dev/null &
+if [ $? -ne 0 ]
+    then
+        echo $tips
+        echo "redshift is not installed"
+        exit 3
+fi
+exit 0
