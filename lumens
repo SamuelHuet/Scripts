@@ -3,7 +3,6 @@
 
 filter=9999
 brightness=9999
-help=$(echo "Type [ENTER] to write commands again")
 tips=$(echo -e "lumens -b [brightness in percent] -f [blue filter in percent] -k [to stop blue filter]")
 install=$(echo "Do not forget to install 'redshift' and 'xbacklight'")
 while getopts ":b:f:k" option
@@ -11,12 +10,22 @@ do
 	case $option in 
 	
 		b)	brightness=$OPTARG
+            if [ $brightness -lt 0 ] || [ $brightness -gt 100 ]
+                then
+                    echo "brightness must be between 0 and 100"
+                    exit 4
+            fi
             brightness=$(echo "scale=2;$brightness*7.78" | bc -l)
             brightness=$(echo "scale=2;$brightness+65" | bc -l)
             brightness=$(echo $brightness | cut -d. -f1)
 		;;
 		
 		f)	filter=$OPTARG
+            if [ $filter -lt 0 ] || [ $filter -gt 100 ]
+                then
+                    echo "filter must be between 0 and 100"
+                    exit 5
+            fi
             filter=$(echo "scale=2;$filter*0.01" | bc -l)
             filter=$(echo "scale=2;1-$filter" | bc -l)
 		;;
@@ -30,7 +39,7 @@ do
             fi
         ;;
 		
-		\?)	echo "$option option is not in my list"
+		\?)	echo "Invalid option"
             echo $tips
 		;;
 	esac
@@ -56,7 +65,6 @@ if [ $# -eq 1 ]
                     echo "redshift is not installed"
                     exit 3
             fi
-            echo $help
             exit 0
         fi
 
